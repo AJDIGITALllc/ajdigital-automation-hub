@@ -14,6 +14,25 @@ The automation hub orchestrates these repositories:
 - **billing-and-payments-repo** → Financial infrastructure and payment processing
 - **ajd-contract-library** → Legal agreements and contract templates
 
+## Modules
+
+The Audio Jones system consists of 5 core modules for comprehensive business automation:
+
+### 🎯 [Marketing Automation Module](docs/marketing-automation-module.md)
+Orchestrates marketing campaigns, lead nurturing, and customer engagement workflows across multiple channels.
+
+### 🚀 [Client Delivery Module](docs/client-delivery-module.md)
+Manages end-to-end client project delivery from onboarding through completion with consistent quality.
+
+### 📊 [Data Intelligence Module](docs/data-intelligence-module.md)
+Collects, processes, and analyzes business data to provide actionable insights for optimization.
+
+### 🤖 [AI Optimization Module](docs/ai-optimization-module.md)
+Leverages AI and machine learning to continuously optimize business processes and efficiency.
+
+### 📈 [Funnel Governance Module](docs/funnel-governance.md)
+Monitors and optimizes conversion funnels across all client touchpoints for consistent performance.
+
 ## Key Features
 
 ### 🚀 Multi-Repository Synchronization
