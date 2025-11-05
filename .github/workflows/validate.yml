@@ -1,0 +1,16 @@
+name: Validate All Repos
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"   # every night at 3 AM UTC
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run validation script
+        run: |
+          echo "Validating AJDIGITAL repo network..."
+          python scripts/validate_repos.py
