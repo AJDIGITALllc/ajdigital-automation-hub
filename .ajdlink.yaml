@@ -1,6 +1,7 @@
 # AJDIGITAL Cross-Repo Link Map
 links:
-  system_modules: https://github.com/AJDIGITALllc/audiojones-system-modules
-  brand_repo: https://github.com/AJDIGITALllc/audiojones-brand-repo
-  billing_repo: https://github.com/AJDIGITALllc/billing-and-payments-repo
-  contract_library: https://github.com/AJDIGITALllc/ajd-contract-library
+  system_modules: https://github.com/AJDIGITALllc/audiojones-system-modules.git
+  brand_repo: https://github.com/AJDIGITALllc/audiojones-brand-repo.git
+  billing_repo: https://github.com/AJDIGITALllc/billing-and-payments-repo.git
+  contract_library: https://github.com/AJDIGITALllc/ajd-contract-library.git
+  automation_hub: https://github.com/AJDIGITALllc/ajdigital-automation-hub.git
