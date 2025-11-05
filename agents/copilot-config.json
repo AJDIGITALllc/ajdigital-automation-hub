@@ -1,0 +1,33 @@
+{
+  "name": "ajdigital-orchestrator",
+  "description": "Copilot Agent for AJDIGITAL infrastructure automation.",
+  "repositories": [
+    "audiojones-system-modules",
+    "audiojones-brand-repo",
+    "billing-and-payments-repo",
+    "ajd-contract-library"
+  ],
+  "tasks": {
+    "validate": "python scripts/validate_repos.py",
+    "sync": "powershell ./sync-all.ps1"
+  },
+  "context": {
+    "infrastructure_type": "multi-repository",
+    "primary_language": "powershell",
+    "automation_hub": "ajdigital-automation-hub",
+    "config_file": ".ajdlink.yaml"
+  },
+  "capabilities": [
+    "cross-repository synchronization",
+    "automated validation workflows",
+    "infrastructure orchestration",
+    "brand consistency enforcement",
+    "system module coordination"
+  ],
+  "integration_points": {
+    "github_actions": ".github/workflows/validate-repos.yml",
+    "repository_map": ".ajdlink.yaml",
+    "sync_tool": "sync-all.ps1",
+    "validation_script": "scripts/validate_repos.py"
+  }
+}
