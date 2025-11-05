@@ -1,0 +1,80 @@
+name: Daily Dashboard Update
+
+on:
+  schedule:
+    # Run daily at 6:00 AM UTC
+    - cron: '0 6 * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+jobs:
+  update-dashboard:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout automation hub
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
+    
+    - name: Checkout all connected repositories
+      run: |
+        cd ..
+        echo "Cloning connected repositories..."
+        
+        # Clone audiojones-system-modules
+        git clone https://github.com/AJDIGITALllc/audiojones-system-modules.git || true
+        
+        # Clone audiojones-brand-repo  
+        git clone https://github.com/AJDIGITALllc/audiojones-brand-repo.git || true
+        
+        # Clone billing-and-payments-repo
+        git clone https://github.com/AJDIGITALllc/billing-and-payments-repo.git || true
+        
+        # Clone ajd-contract-library
+        git clone https://github.com/AJDIGITALllc/ajd-contract-library.git || true
+        
+        ls -la
+    
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+    
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install pyyaml
+    
+    - name: Generate dashboard
+      run: |
+        python scripts/validate_repos.py --dashboard --verbose
+    
+    - name: Check for changes
+      id: changes
+      run: |
+        git diff --quiet docs/status-dashboard.md || echo "changed=true" >> $GITHUB_OUTPUT
+    
+    - name: Commit and push dashboard updates
+      if: steps.changes.outputs.changed == 'true'
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/status-dashboard.md
+        git commit -m "docs: automated dashboard update - $(date -u '+%Y-%m-%d %H:%M UTC')"
+        git push
+    
+    - name: Dashboard update summary
+      run: |
+        echo "📊 Dashboard Update Summary"
+        echo "=========================="
+        echo "Timestamp: $(date -u '+%Y-%m-%d %H:%M UTC')"
+        echo "Repository count: $(python scripts/validate_repos.py | grep -o '[0-9]*/[0-9]* repositories' || echo 'N/A')"
+        echo "Dashboard file: docs/status-dashboard.md"
+        
+        if [ "${{ steps.changes.outputs.changed }}" == "true" ]; then
+          echo "Status: ✅ Dashboard updated and committed"
+        else
+          echo "Status: ℹ️ No changes detected, dashboard up to date"
+        fi
