@@ -1,6 +1,17 @@
-name: TODO
-description: TODO
-inputs: TODO
-outputs: TODO
-triggers: TODO
-integrations: TODO
+name: data-intelligence
+description: >
+  ETL, KPI rollups, and anomaly alerts for all AJ DIGITAL automations.
+triggers:
+  - schedule: nightly
+  - source: n8n
+    event: etl_failure
+integrations:
+  - n8n
+  - google_sheets
+  - looker_studio
+  - slack
+outputs:
+  - refreshed_master_sheets
+  - slack_alert_on_drift
+  - dashboard_refresh
+notes: TODO define validation thresholds

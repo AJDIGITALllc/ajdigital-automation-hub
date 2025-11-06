@@ -1,6 +1,16 @@
-name: TODO
-description: TODO
-inputs: TODO
-outputs: TODO
-triggers: TODO
-integrations: TODO
+name: funnel-governance
+description: >
+  Ops cadence and change management for all automation modules.
+triggers:
+  - schedule: weekly
+  - schedule: monthly
+  - schedule: quarterly
+integrations:
+  - n8n
+  - slack
+  - github
+outputs:
+  - ops_status_log
+  - sop_update_issue
+  - audit_report
+notes: TODO add impact-level (low/medium/high) tagging

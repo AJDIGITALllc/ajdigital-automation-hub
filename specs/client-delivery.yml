@@ -1,6 +1,18 @@
-name: TODO
-description: TODO
-inputs: TODO
-outputs: TODO
-triggers: TODO
-integrations: TODO
+name: client-delivery
+description: >
+  Automations that run after purchase to onboard, fulfill, and request reviews.
+triggers:
+  - source: whop
+    event: payment_succeeded
+  - source: gbu
+    event: contract_signed
+integrations:
+  - n8n
+  - mailerlite
+  - google_business_ultra
+  - whop
+outputs:
+  - onboarding_email_sent
+  - project_space_created
+  - testimonial_request_sent
+notes: TODO map per-offer onboarding templates

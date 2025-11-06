@@ -27,5 +27,10 @@ Business Metrics  Feature Selection     Cross-validation       Resource Optimiza
 - **Monthly**: Algorithm performance comparison and optimization
 - **Quarterly**: AI strategy review and new capability development
 
+## Related automations (n8n, MailerLite, Whop)
+- Detect low engagement → switch MailerLite sequence
+- High-score lead → unlock Whop bonus / higher tier
+- Weekly AI optimization report → Slack
+
 ## Repo Link / Source
 TODO: Link to specific repository and implementation details

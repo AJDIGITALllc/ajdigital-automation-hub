@@ -1,6 +1,17 @@
-name: TODO
-description: TODO
-inputs: TODO
-outputs: TODO
-triggers: TODO
-integrations: TODO
+name: ai-optimization
+description: >
+  Adaptive, model-driven improvements to email, offers, and funnels.
+triggers:
+  - source: data-intelligence
+    event: low_engagement_detected
+  - schedule: weekly
+integrations:
+  - n8n
+  - mailerlite
+  - whop
+  - openai
+outputs:
+  - sequence_switched
+  - offer_adjusted
+  - weekly_summary_posted
+notes: TODO connect to model retrain pipeline

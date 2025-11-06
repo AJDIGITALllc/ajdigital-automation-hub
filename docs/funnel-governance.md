@@ -27,5 +27,10 @@ Documentation      Real-time Monitoring  Improvement Prioritization Implementati
 - **Monthly**: Comprehensive funnel health reports and stakeholder reviews
 - **Quarterly**: Funnel strategy evaluation and governance framework updates
 
+## Related automations (n8n, Slack, GitHub)
+- Weekly automation health check → Slack summary
+- Monthly SOP update → create / update GitHub issue
+- Quarterly audit → generate checklist and assign
+
 ## Repo Link / Source
 TODO: Link to specific repository and implementation details

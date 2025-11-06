@@ -1,6 +1,16 @@
-name: TODO
-description: TODO
-inputs: TODO
-outputs: TODO
-triggers: TODO
-integrations: TODO
+name: marketing-automation
+description: >
+  Centralize lead capture, nurture, and conversion across Beacon AI, n8n, MailerLite, and Whop.
+triggers:
+  - source: beacon_ai
+    event: lead_captured
+  - source: mailerlite
+    event: link_clicked
+integrations:
+  - n8n
+  - mailerlite
+  - whop
+outputs:
+  - consultation_booked
+  - offer_purchased
+notes: TODO add scoring weights and A/B testing fields

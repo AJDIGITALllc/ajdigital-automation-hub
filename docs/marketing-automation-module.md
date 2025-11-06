@@ -24,5 +24,10 @@ Email/SMS      CRM Integration   Multi-channel     Analytics Dashboard  Revenue 
 - **Monthly**: Comprehensive performance analysis and strategy adjustments
 - **Quarterly**: Full system audit and integration updates
 
+## Related automations (n8n, MailerLite, Whop)
+- Lead capture → n8n webhook → MailerLite tag
+- Low-engagement lead → MailerLite reactivation
+- Offer purchase → Whop → n8n → MailerLite "customer" segment
+
 ## Repo Link / Source
 TODO: Link to specific repository and implementation details

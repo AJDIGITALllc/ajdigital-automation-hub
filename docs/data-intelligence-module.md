@@ -27,5 +27,10 @@ Multiple Sources   ETL Pipelines    Machine Learning    Predictive Analytics   I
 - **Monthly**: Data source integration health checks
 - **Quarterly**: Full analytics infrastructure audit and capability expansion
 
+## Related automations (n8n, Sheets, Data Studio)
+- Nightly ETL from sources → Google Sheets
+- Data drift > 5% → n8n → Slack alert to ops
+- Dashboard refresh cadence → Data Studio
+
 ## Repo Link / Source
 TODO: Link to specific repository and implementation details

@@ -14,7 +14,7 @@ The automation hub orchestrates these repositories:
 - **billing-and-payments-repo** → Financial infrastructure and payment processing
 - **ajd-contract-library** → Legal agreements and contract templates
 
-## Modules
+## System Modules
 
 The Audio Jones system consists of 5 core modules for comprehensive business automation:
 

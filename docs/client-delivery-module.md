@@ -26,5 +26,10 @@ Requirements     Milestone Setup    Team Assignment     Status Updates     Quali
 - **Monthly**: Client satisfaction surveys and process improvements
 - **Quarterly**: Full delivery pipeline analysis and methodology updates
 
+## Related automations (n8n, MailerLite, Whop, GBU)
+- Whop payment → n8n → create/send GBU contract
+- Contract signed → n8n → send onboarding/welcome via MailerLite
+- Project complete → n8n → send review / referral sequence
+
 ## Repo Link / Source
 TODO: Link to specific repository and implementation details
