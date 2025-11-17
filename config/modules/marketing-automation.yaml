@@ -1,0 +1,111 @@
+id: marketing-automation
+name: Marketing Automation Module
+description: Automated marketing workflows, email sequences, and audience engagement
+
+entryTriggers:
+  - event: booking.created
+    description: New client enters funnel
+    payload:
+      bookingId: string
+      userId: string
+      serviceId: string
+
+  - event: booking.status_changed_to_pending_payment
+    description: Client reached payment stage
+    payload:
+      bookingId: string
+      paymentUrl: string
+      amount: number
+
+  - event: user.registered
+    description: New user signed up
+    payload:
+      userId: string
+      email: string
+      source: string
+
+  - event: booking.completed
+    description: Service successfully delivered
+    payload:
+      bookingId: string
+      userId: string
+      completedAt: string
+
+actions:
+  - name: enqueue_welcome_sequence
+    description: Start onboarding email sequence for new users
+    triggers:
+      - user.registered
+    dependencies:
+      - email_service
+    outputs:
+      - sequenceId: string
+      - scheduledEmails: array
+
+  - name: trigger_payment_reminder
+    description: Send payment reminder after 24h
+    triggers:
+      - booking.status_changed_to_pending_payment
+    delay: 24h
+    dependencies:
+      - email_service
+
+  - name: send_post_delivery_survey
+    description: Request feedback after service completion
+    triggers:
+      - booking.completed
+    delay: 48h
+    dependencies:
+      - email_service
+    outputs:
+      - surveyUrl: string
+
+  - name: update_audience_segments
+    description: Recalculate user segments based on behavior
+    triggers:
+      - booking.created
+      - booking.completed
+    dependencies:
+      - email_service
+      - analytics_engine
+
+  - name: trigger_retargeting_campaign
+    description: Re-engage inactive users
+    schedule: weekly
+    dependencies:
+      - email_service
+      - analytics_engine
+
+dependencies:
+  email_service:
+    provider: mailerlite
+    envVars:
+      - MAILERLITE_API_KEY
+      - MAILERLITE_GROUP_ID
+      - MAILERLITE_WELCOME_AUTOMATION_ID
+      - MAILERLITE_PAYMENT_REMINDER_TEMPLATE_ID
+
+  analytics_engine:
+    provider: custom
+    envVars:
+      - ANALYTICS_API_URL
+      - ANALYTICS_API_KEY
+
+  firebase:
+    collections:
+      - users
+      - bookings
+      - campaigns
+    envVars:
+      - FIREBASE_PROJECT_ID
+      - FIREBASE_CLIENT_EMAIL
+      - FIREBASE_PRIVATE_KEY
+
+  n8n:
+    workflows:
+      - marketing-welcome-sequence
+      - payment-reminder-flow
+      - post-delivery-survey
+    envVars:
+      - N8N_API_KEY
+      - N8N_WEBHOOK_URL

@@ -1,0 +1,195 @@
+---
+# Audio Jones Modules Router
+# Declarative event routing specification for automation modules
+
+version: "1.0"
+description: Maps portal events to module actions
+
+eventRoutes:
+  # Booking Lifecycle Events
+  - event: booking.created
+    modules:
+      - client-delivery
+      - marketing-automation
+      - data-intelligence
+    priority: high
+    description: New booking initiates delivery workflow, marketing touch, and analytics
+
+  - event: booking.status_updated
+    modules:
+      - client-delivery
+      - data-intelligence
+    conditions:
+      - field: newStatus
+        operator: in
+        values: [pending, approved, in_progress, completed, cancelled]
+    priority: medium
+    description: Status changes trigger notifications and metric updates
+
+  - event: booking.status_changed_to_pending_payment
+    modules:
+      - marketing-automation
+    priority: high
+    description: Payment pending triggers reminder sequence
+
+  - event: booking.completed
+    modules:
+      - client-delivery
+      - marketing-automation
+      - data-intelligence
+    priority: high
+    description: Completion triggers delivery confirmation, survey, and revenue tracking
+
+  # Payment Events
+  - event: payment.completed
+    modules:
+      - client-delivery
+      - data-intelligence
+    priority: high
+    description: Payment success enables project delivery and updates financials
+
+  - event: payment.failed
+    modules:
+      - marketing-automation
+    priority: high
+    description: Failed payment triggers recovery workflow
+
+  # Asset Events
+  - event: asset.uploaded
+    modules:
+      - client-delivery
+      - ai-optimization
+      - data-intelligence
+    conditions:
+      - field: fileType
+        operator: matches
+        pattern: "^(audio|video|image)/"
+    priority: medium
+    description: Asset uploads trigger processing, AI analysis, and storage metrics
+
+  - event: asset.final_delivery
+    modules:
+      - client-delivery
+      - marketing-automation
+    priority: high
+    description: Final deliverable triggers completion workflow
+
+  # User Events
+  - event: user.registered
+    modules:
+      - marketing-automation
+    priority: medium
+    description: New user enters welcome sequence
+
+  - event: user.inactive
+    modules:
+      - marketing-automation
+    schedule: weekly
+    priority: low
+    description: Inactive users enter re-engagement campaign
+
+  # Content Events
+  - event: content.submitted_for_review
+    modules:
+      - ai-optimization
+    priority: medium
+    description: Content ready for AI quality check
+
+  # Service Configuration Events
+  - event: service.created
+    modules:
+      - data-intelligence
+    priority: low
+    description: New service tracked for catalog analytics
+
+  - event: service.whop_synced
+    modules:
+      - data-intelligence
+    priority: low
+    description: Whop product sync updates catalog
+
+# Module Dependencies
+moduleDependencies:
+  client-delivery:
+    required:
+      - firebase
+      - email_service
+    optional:
+      - slack_webhook
+      - n8n
+
+  marketing-automation:
+    required:
+      - email_service
+      - firebase
+    optional:
+      - analytics_engine
+      - n8n
+
+  ai-optimization:
+    required:
+      - ai_engine
+      - firebase
+    optional:
+      - file_storage
+      - n8n
+
+  data-intelligence:
+    required:
+      - firestore
+      - analytics_engine
+    optional:
+      - redis_cache
+      - bigquery
+      - n8n
+
+# Event Priority Levels
+priorityHandling:
+  high:
+    maxRetries: 5
+    retryDelay: exponential
+    alertOnFailure: true
+    timeout: 30s
+
+  medium:
+    maxRetries: 3
+    retryDelay: linear
+    alertOnFailure: false
+    timeout: 60s
+
+  low:
+    maxRetries: 1
+    retryDelay: none
+    alertOnFailure: false
+    timeout: 120s
+
+# Error Handling
+errorHandling:
+  deadLetterQueue:
+    enabled: true
+    collection: failed_events
+    retentionDays: 30
+
+  fallback:
+    logToFirestore: true
+    notifyAdmin: true
+    continueProcessing: false
+
+# Observability
+observability:
+  tracing:
+    enabled: true
+    provider: firebase_tracing
+
+  metrics:
+    enabled: true
+    collections:
+      - event_throughput
+      - module_latency
+      - error_rates
+
+  logging:
+    level: info
+    destinations:
+      - firebase_logs
+      - console

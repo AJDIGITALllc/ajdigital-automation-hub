@@ -1,0 +1,149 @@
+id: data-intelligence
+name: Data Intelligence Module
+description: Business intelligence, reporting, and data analytics
+
+entryTriggers:
+  - event: booking.created
+    description: New data point for analytics
+    payload:
+      bookingId: string
+      serviceId: string
+      tenantId: string
+      revenue: number
+
+  - event: booking.completed
+    description: Completed transaction for revenue tracking
+    payload:
+      bookingId: string
+      revenue: number
+      completedAt: string
+
+  - event: payment.completed
+    description: Payment processed for financial reporting
+    payload:
+      paymentId: string
+      amount: number
+      provider: string
+
+  - event: asset.uploaded
+    description: Asset activity for usage metrics
+    payload:
+      assetId: string
+      fileSize: number
+      uploadedAt: string
+
+actions:
+  - name: update_dashboard_metrics
+    description: Recalculate real-time dashboard KPIs
+    triggers:
+      - booking.created
+      - booking.completed
+      - payment.completed
+    outputs:
+      - metricsUpdated: array
+    dependencies:
+      - firestore
+      - redis_cache
+
+  - name: generate_revenue_report
+    description: Create daily/weekly/monthly revenue summaries
+    schedule: daily
+    outputs:
+      - reportId: string
+      - totalRevenue: number
+      - bookingCount: number
+    dependencies:
+      - firestore
+      - reporting_engine
+
+  - name: compute_client_lifetime_value
+    description: Calculate CLV for each tenant/user
+    triggers:
+      - booking.completed
+    outputs:
+      - userId: string
+      - lifetimeValue: number
+      - predictedChurn: number
+    dependencies:
+      - ai_engine
+      - firestore
+
+  - name: track_funnel_conversion
+    description: Monitor conversion rates across pipeline stages
+    triggers:
+      - booking.created
+      - booking.status_updated
+    dependencies:
+      - analytics_engine
+
+  - name: export_data_warehouse
+    description: Sync aggregated data to warehouse
+    schedule: daily
+    dependencies:
+      - firestore
+      - bigquery
+    outputs:
+      - recordsExported: number
+
+  - name: detect_anomalies
+    description: Alert on unusual patterns or metrics
+    schedule: hourly
+    outputs:
+      - anomalies: array
+    dependencies:
+      - ai_engine
+      - alerting_service
+
+dependencies:
+  firestore:
+    collections:
+      - bookings
+      - users
+      - payments
+      - assets
+      - metrics
+    envVars:
+      - FIREBASE_PROJECT_ID
+      - FIREBASE_CLIENT_EMAIL
+      - FIREBASE_PRIVATE_KEY
+
+  redis_cache:
+    envVars:
+      - REDIS_URL
+      - REDIS_PASSWORD
+
+  ai_engine:
+    provider: openai
+    envVars:
+      - OPENAI_API_KEY
+
+  analytics_engine:
+    provider: custom
+    envVars:
+      - ANALYTICS_API_URL
+      - ANALYTICS_API_KEY
+
+  reporting_engine:
+    provider: custom
+    envVars:
+      - REPORTING_API_URL
+
+  bigquery:
+    envVars:
+      - BIGQUERY_PROJECT_ID
+      - BIGQUERY_DATASET
+      - BIGQUERY_CREDENTIALS
+
+  alerting_service:
+    provider: slack
+    envVars:
+      - SLACK_WEBHOOK_URL
+
+  n8n:
+    workflows:
+      - data-sync-pipeline
+      - anomaly-detection-flow
+      - revenue-reporting
+    envVars:
+      - N8N_API_KEY
+      - N8N_WEBHOOK_URL

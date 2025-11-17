@@ -1,0 +1,107 @@
+id: client-delivery
+name: Client Delivery Module
+description: Manages end-to-end project delivery workflow from booking to asset delivery
+
+entryTriggers:
+  - event: booking.created
+    description: New booking initiated by client
+    payload:
+      bookingId: string
+      serviceId: string
+      userId: string
+      tenantId: string
+      status: string
+
+  - event: booking.status_updated
+    description: Booking status changed
+    payload:
+      bookingId: string
+      oldStatus: string
+      newStatus: string
+      changedBy: string
+
+  - event: asset.uploaded
+    description: Client or admin uploaded asset
+    payload:
+      assetId: string
+      bookingId: string
+      fileType: string
+      uploadedBy: string
+
+  - event: payment.completed
+    description: Payment successfully processed
+    payload:
+      bookingId: string
+      paymentId: string
+      amount: number
+      provider: string
+
+actions:
+  - name: create_onboarding_checklist
+    description: Generate initial task set for new booking
+    triggers:
+      - booking.created
+    outputs:
+      - taskListId: string
+      - estimatedDuration: number
+
+  - name: send_booking_confirmation
+    description: Email confirmation to client
+    triggers:
+      - booking.created
+    dependencies:
+      - email_service
+
+  - name: trigger_status_notifications
+    description: Notify stakeholders of status changes
+    triggers:
+      - booking.status_updated
+    dependencies:
+      - email_service
+      - slack_webhook
+
+  - name: process_asset_upload
+    description: Validate, index, and notify about new assets
+    triggers:
+      - asset.uploaded
+    outputs:
+      - processedUrl: string
+      - thumbnailUrl: string
+
+  - name: update_delivery_timeline
+    description: Recalculate project timeline based on current status
+    triggers:
+      - booking.status_updated
+      - asset.uploaded
+    dependencies:
+      - firestore
+
+dependencies:
+  firebase:
+    collections:
+      - bookings
+      - assets
+      - users
+      - services
+    envVars:
+      - FIREBASE_PROJECT_ID
+      - FIREBASE_CLIENT_EMAIL
+      - FIREBASE_PRIVATE_KEY
+
+  email_service:
+    provider: mailerlite
+    envVars:
+      - MAILERLITE_API_KEY
+      - MAILERLITE_GROUP_ID
+
+  slack_webhook:
+    envVars:
+      - SLACK_WEBHOOK_URL
+
+  n8n:
+    workflows:
+      - client-delivery-onboarding
+      - asset-processing-pipeline
+    envVars:
+      - N8N_API_KEY
+      - N8N_WEBHOOK_URL

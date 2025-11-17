@@ -153,3 +153,149 @@ When working within this infrastructure:
 4. Follow the established patterns for cross-repository integration
 
 For detailed development guidelines, see the individual repository documentation.
+## Module Automation Configs
+
+### Overview
+
+The config/modules/ directory contains declarative YAML specifications for each Audio Jones system module. These configs define event-driven automation workflows without implementing actual API integrations.
+
+### Module Configuration Files
+
+Each module config file (*.yaml) includes:
+
+- **Entry Triggers**: Events from portals that activate the module (e.g., ooking.created, sset.uploaded)
+- **Actions**: High-level automation steps executed in response to triggers
+- **Dependencies**: External systems referenced (Firebase, Whop, Stripe, MailerLite, n8n, OpenAI, etc.)
+- **Outputs**: Data structures returned by actions
+
+### Available Modules
+
+#### 1. Client Delivery (client-delivery.yaml)
+Manages end-to-end project delivery workflow from booking to asset delivery.
+
+**Key Triggers**:
+- ooking.created  Create onboarding checklist, send confirmation
+- ooking.status_updated  Trigger status notifications
+- sset.uploaded  Process and index assets
+- payment.completed  Enable delivery workflow
+
+**Dependencies**: Firebase, MailerLite, Slack, n8n
+
+#### 2. Marketing Automation (marketing-automation.yaml)
+Automated marketing workflows, email sequences, and audience engagement.
+
+**Key Triggers**:
+- user.registered  Welcome email sequence
+- ooking.status_changed_to_pending_payment  Payment reminder (24h delay)
+- ooking.completed  Post-delivery survey (48h delay)
+
+**Dependencies**: MailerLite, Firebase, Analytics Engine, n8n
+
+#### 3. AI Optimization (i-optimization.yaml)
+AI-powered content analysis, optimization, and recommendations.
+
+**Key Triggers**:
+- sset.uploaded  Audio analysis, quality metrics
+- ooking.created  Predict delivery timeline
+- content.submitted_for_review  Generate improvement recommendations
+
+**Dependencies**: OpenAI (GPT-4, Whisper, DALL-E), Firebase Storage, n8n
+
+#### 4. Data Intelligence (data-intelligence.yaml)
+Business intelligence, reporting, and data analytics.
+
+**Key Triggers**:
+- ooking.completed  Revenue tracking, CLV calculation
+- payment.completed  Financial reporting
+- Daily schedule  Generate revenue reports, export to warehouse
+
+**Dependencies**: Firebase, Redis, BigQuery, Slack, n8n
+
+### Global Router (modules-router.yaml)
+
+The router config maps portal events to module actions:
+
+**Event Routing Logic**:
+`yaml
+booking.created  [client-delivery, marketing-automation, data-intelligence]
+asset.uploaded  [client-delivery, ai-optimization, data-intelligence]
+payment.completed  [client-delivery, data-intelligence]
+`
+
+**Priority Levels**:
+- **High**: Payment events, booking completion (5 retries, 30s timeout)
+- **Medium**: Status updates, asset uploads (3 retries, 60s timeout)
+- **Low**: Analytics, scheduled tasks (1 retry, 120s timeout)
+
+**Error Handling**:
+- Dead letter queue for failed events (30-day retention)
+- Admin alerts on high-priority failures
+- Observability via Firebase tracing and metrics
+
+### How to Use These Configs
+
+#### For n8n Workflow Development
+
+1. Reference event trigger names from module configs
+2. Use specified payload structures for workflow inputs
+3. Map dependencies to actual n8n credentials/nodes
+4. Follow action output schemas for data flow
+
+Example n8n workflow structure:
+`
+Webhook (booking.created) 
+   Firebase Node (fetch booking data)
+   MailerLite Node (send confirmation)
+   Firebase Node (update status)
+`
+
+#### For Custom Worker Implementation
+
+1. Parse YAML configs to understand event  module  action mappings
+2. Subscribe to Firebase event collections or Pub/Sub topics
+3. Route events to module handlers based on modules-router.yaml
+4. Use action specs to implement processing logic
+
+#### Environment Variables
+
+**Never store credentials in this repo.** Reference env var names only:
+
+- FIREBASE_PROJECT_ID, FIREBASE_CLIENT_EMAIL, FIREBASE_PRIVATE_KEY
+- MAILERLITE_API_KEY, MAILERLITE_GROUP_ID
+- OPENAI_API_KEY, OPENAI_ORG_ID
+- N8N_API_KEY, N8N_WEBHOOK_URL
+- SLACK_WEBHOOK_URL
+- BIGQUERY_PROJECT_ID, BIGQUERY_CREDENTIALS
+
+Actual credentials should be managed via:
+- Vercel environment variables (for Next.js portals)
+- n8n credential vault (for workflows)
+- Firebase Admin SDK service account (for backend)
+
+### Validation
+
+To validate module configs:
+
+`powershell
+# Check YAML syntax
+Get-Content config/modules/*.yaml | ConvertFrom-Yaml
+
+# Validate against schema (when available)
+python scripts/validate_modules.py
+`
+
+### Maintenance
+
+When adding new modules:
+
+1. Create config/modules/{module-id}.yaml following the established schema
+2. Add event routes to config/modules-router.yaml
+3. Document dependencies and env vars
+4. Update this README with module description
+
+When adding new event types:
+
+1. Define event structure in module config entryTriggers
+2. Add routing rules to modules-router.yaml
+3. Update dependent modules that should respond to the event
+
