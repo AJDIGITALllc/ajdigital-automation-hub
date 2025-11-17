@@ -1,0 +1,66 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Audio Jones System Modules",
+  "description": "Central configuration for all Audio Jones system modules across marketing, client portal, and admin portal",
+  "modules": [
+    {
+      "id": "client-delivery",
+      "name": "Client Delivery",
+      "shortDescription": "Project management and client communication platform",
+      "longDescription": "Comprehensive project management, file sharing, and milestone tracking system that keeps clients informed throughout every phase of production.",
+      "suggestedPersonas": ["creator", "business"],
+      "funnelStage": "deliver"
+    },
+    {
+      "id": "marketing-automation",
+      "name": "Marketing Automation",
+      "shortDescription": "Automated campaign management and analytics",
+      "longDescription": "Multi-channel campaign orchestration with automated email sequences, social media scheduling, and real-time performance analytics.",
+      "suggestedPersonas": ["business"],
+      "funnelStage": "retain"
+    },
+    {
+      "id": "ai-optimization",
+      "name": "AI Optimization",
+      "shortDescription": "AI-powered workflow enhancement and quality control",
+      "longDescription": "Machine learning-driven audio enhancement, automated mastering suggestions, and intelligent workflow optimization to accelerate production quality.",
+      "suggestedPersonas": ["creator", "business"],
+      "funnelStage": "optimize"
+    },
+    {
+      "id": "data-intelligence",
+      "name": "Data Intelligence",
+      "shortDescription": "Advanced analytics and predictive insights",
+      "longDescription": "Centralized business intelligence dashboard with predictive analytics, revenue forecasting, and actionable insights from all integrated data sources.",
+      "suggestedPersonas": ["business"],
+      "funnelStage": "optimize"
+    }
+  ],
+  "funnelStages": [
+    {
+      "code": "discover",
+      "label": "Discover",
+      "description": "Initial awareness and research phase"
+    },
+    {
+      "code": "book",
+      "label": "Book",
+      "description": "Service selection and booking process"
+    },
+    {
+      "code": "deliver",
+      "label": "Deliver",
+      "description": "Project execution and delivery"
+    },
+    {
+      "code": "optimize",
+      "label": "Optimize",
+      "description": "Performance analysis and improvement"
+    },
+    {
+      "code": "retain",
+      "label": "Retain",
+      "description": "Ongoing engagement and retention"
+    }
+  ]
+}

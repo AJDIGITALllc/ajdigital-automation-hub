@@ -1,0 +1,141 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Audio Jones Shared Vocabulary",
+  "description": "Shared terminology and status codes used across all Audio Jones applications",
+  "bookingStatuses": [
+    {
+      "code": "DRAFT",
+      "label": "Draft",
+      "description": "Booking created but not yet submitted"
+    },
+    {
+      "code": "PENDING_PAYMENT",
+      "label": "Awaiting Payment",
+      "description": "Booking submitted, waiting for payment confirmation"
+    },
+    {
+      "code": "CONFIRMED",
+      "label": "Confirmed",
+      "description": "Payment received and booking confirmed"
+    },
+    {
+      "code": "IN_PROGRESS",
+      "label": "In Progress",
+      "description": "Work has started on the project"
+    },
+    {
+      "code": "REVIEW",
+      "label": "Under Review",
+      "description": "Deliverables submitted for client review"
+    },
+    {
+      "code": "REVISION_REQUESTED",
+      "label": "Revision Requested",
+      "description": "Client requested changes to deliverables"
+    },
+    {
+      "code": "COMPLETED",
+      "label": "Completed",
+      "description": "Project finished and delivered"
+    },
+    {
+      "code": "CANCELLED",
+      "label": "Cancelled",
+      "description": "Booking cancelled by client or admin"
+    },
+    {
+      "code": "REFUNDED",
+      "label": "Refunded",
+      "description": "Payment refunded to client"
+    }
+  ],
+  "personas": [
+    {
+      "code": "creator",
+      "label": "Creator",
+      "description": "Individual content creators, artists, and freelancers"
+    },
+    {
+      "code": "business",
+      "label": "Business",
+      "description": "Companies, agencies, and organizations"
+    },
+    {
+      "code": "both",
+      "label": "Universal",
+      "description": "Suitable for both creators and businesses"
+    }
+  ],
+  "modules": [
+    {
+      "id": "client-delivery",
+      "name": "Client Delivery"
+    },
+    {
+      "id": "marketing-automation",
+      "name": "Marketing Automation"
+    },
+    {
+      "id": "ai-optimization",
+      "name": "AI Optimization"
+    },
+    {
+      "id": "data-intelligence",
+      "name": "Data Intelligence"
+    }
+  ],
+  "serviceCategories": [
+    {
+      "code": "audio-production",
+      "label": "Audio Production",
+      "description": "Recording, mixing, mastering, and post-production services"
+    },
+    {
+      "code": "podcast-production",
+      "label": "Podcast Production",
+      "description": "Full podcast production and editing services"
+    },
+    {
+      "code": "voice-over",
+      "label": "Voice Over",
+      "description": "Professional voice recording and editing"
+    },
+    {
+      "code": "sound-design",
+      "label": "Sound Design",
+      "description": "Custom sound effects and audio branding"
+    },
+    {
+      "code": "music-composition",
+      "label": "Music Composition",
+      "description": "Original music creation and scoring"
+    },
+    {
+      "code": "consultation",
+      "label": "Consultation",
+      "description": "Expert advice and strategy sessions"
+    }
+  ],
+  "priorityLevels": [
+    {
+      "code": "low",
+      "label": "Low",
+      "value": 1
+    },
+    {
+      "code": "medium",
+      "label": "Medium",
+      "value": 2
+    },
+    {
+      "code": "high",
+      "label": "High",
+      "value": 3
+    },
+    {
+      "code": "urgent",
+      "label": "Urgent",
+      "value": 4
+    }
+  ]
+}
