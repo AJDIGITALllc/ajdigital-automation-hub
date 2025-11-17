@@ -1,0 +1,28 @@
+{
+  "name": "ajdigital-automation-hub",
+  "version": "1.0.0",
+  "description": "Infrastructure and configuration hub for Audio Jones ecosystem",
+  "main": "dist/lib/playbooks.js",
+  "types": "dist/lib/playbooks.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "validate:configs": "node scripts/validate-configs.js",
+    "test": "echo \"No tests yet\" && exit 0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AJDIGITALllc/ajdigital-automation-hub.git"
+  },
+  "keywords": [
+    "automation",
+    "config",
+    "infrastructure"
+  ],
+  "author": "Audio Jones Digital",
+  "license": "MIT",
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "ajv": "^8.12.0",
+    "typescript": "^5.0.0"
+  }
+}

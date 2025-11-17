@@ -1,0 +1,146 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Funnel Map Configuration",
+  "description": "Schema for funnel-map.json configuration file",
+  "type": "object",
+  "required": ["funnel"],
+  "properties": {
+    "funnel": {
+      "type": "object",
+      "required": ["description", "stages", "cadence", "cross_stage_integrations"],
+      "properties": {
+        "description": {
+          "type": "string",
+          "description": "Overall funnel description"
+        },
+        "stages": {
+          "type": "array",
+          "description": "Funnel stages",
+          "items": {
+            "type": "object",
+            "required": [
+              "id",
+              "name",
+              "description",
+              "primary_module_ids",
+              "key_activities",
+              "success_metrics"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "description": "Unique stage identifier",
+                "pattern": "^[a-z-]+$"
+              },
+              "name": {
+                "type": "string",
+                "description": "Stage name"
+              },
+              "description": {
+                "type": "string",
+                "description": "Stage description"
+              },
+              "primary_module_ids": {
+                "type": "array",
+                "description": "Primary modules for this stage",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "key_activities": {
+                "type": "array",
+                "description": "Key activities in this stage",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "success_metrics": {
+                "type": "array",
+                "description": "Success metrics for this stage",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "cadence": {
+          "type": "object",
+          "required": ["weekly", "monthly", "quarterly", "annual"],
+          "properties": {
+            "weekly": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/cadenceTask"
+              }
+            },
+            "monthly": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/cadenceTask"
+              }
+            },
+            "quarterly": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/cadenceTask"
+              }
+            },
+            "annual": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/cadenceTask"
+              }
+            }
+          }
+        },
+        "cross_stage_integrations": {
+          "type": "array",
+          "description": "Integrations between funnel stages",
+          "items": {
+            "type": "object",
+            "required": ["from_stage", "to_stage", "integration", "automation"],
+            "properties": {
+              "from_stage": {
+                "type": "string",
+                "description": "Source stage ID"
+              },
+              "to_stage": {
+                "type": "string",
+                "description": "Destination stage ID"
+              },
+              "integration": {
+                "type": "string",
+                "description": "Integration description"
+              },
+              "automation": {
+                "type": "string",
+                "description": "Automation workflow description"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "cadenceTask": {
+      "type": "object",
+      "required": ["task", "owner", "deliverable"],
+      "properties": {
+        "task": {
+          "type": "string",
+          "description": "Task description"
+        },
+        "owner": {
+          "type": "string",
+          "description": "Module responsible for the task"
+        },
+        "deliverable": {
+          "type": "string",
+          "description": "Expected deliverable"
+        }
+      }
+    }
+  }
+}

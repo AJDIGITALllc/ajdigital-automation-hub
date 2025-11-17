@@ -1,0 +1,224 @@
+{
+  "funnel": {
+    "description": "Audio Jones complete customer lifecycle funnel",
+    "stages": [
+      {
+        "id": "discover",
+        "name": "Discover",
+        "description": "Attract and engage potential clients through marketing channels",
+        "primary_module_ids": ["marketing-automation", "data-intelligence"],
+        "key_activities": [
+          "Content marketing and SEO",
+          "Social media engagement",
+          "Paid advertising campaigns",
+          "Lead magnet distribution",
+          "Brand awareness building"
+        ],
+        "success_metrics": [
+          "Website traffic",
+          "Lead capture rate",
+          "Cost per lead",
+          "Engagement rate"
+        ]
+      },
+      {
+        "id": "book",
+        "name": "Book",
+        "description": "Convert interested leads into paying clients",
+        "primary_module_ids": ["marketing-automation", "client-delivery"],
+        "key_activities": [
+          "Lead nurturing sequences",
+          "Sales consultations",
+          "Proposal generation",
+          "Payment processing",
+          "Contract execution"
+        ],
+        "success_metrics": [
+          "Booking conversion rate",
+          "Average deal value",
+          "Sales cycle length",
+          "Payment completion rate"
+        ]
+      },
+      {
+        "id": "deliver",
+        "name": "Deliver",
+        "description": "Execute client projects with excellence and consistency",
+        "primary_module_ids": ["client-delivery", "ai-optimization"],
+        "key_activities": [
+          "Client onboarding",
+          "Project planning and execution",
+          "Progress tracking and reporting",
+          "Quality assurance",
+          "Client communication"
+        ],
+        "success_metrics": [
+          "On-time delivery rate",
+          "Client satisfaction score",
+          "Project margin",
+          "Resource utilization"
+        ]
+      },
+      {
+        "id": "optimize",
+        "name": "Optimize",
+        "description": "Continuously improve processes and outcomes using data and AI",
+        "primary_module_ids": ["ai-optimization", "data-intelligence"],
+        "key_activities": [
+          "Performance data analysis",
+          "Process optimization",
+          "Predictive modeling",
+          "A/B testing",
+          "Automation refinement"
+        ],
+        "success_metrics": [
+          "Efficiency improvement rate",
+          "Model accuracy",
+          "Cost reduction",
+          "ROI improvement"
+        ]
+      },
+      {
+        "id": "retain",
+        "name": "Retain",
+        "description": "Maintain client relationships and drive repeat business",
+        "primary_module_ids": ["client-delivery", "marketing-automation"],
+        "key_activities": [
+          "Post-project follow-up",
+          "Customer success check-ins",
+          "Upsell and cross-sell campaigns",
+          "Referral program activation",
+          "Loyalty nurturing"
+        ],
+        "success_metrics": [
+          "Client retention rate",
+          "Lifetime value (LTV)",
+          "Referral rate",
+          "Repeat purchase rate"
+        ]
+      }
+    ],
+    "cadence": {
+      "weekly": [
+        {
+          "task": "Monitor funnel conversion metrics across all stages",
+          "owner": "data-intelligence",
+          "deliverable": "Weekly funnel performance dashboard"
+        },
+        {
+          "task": "Review and optimize active marketing campaigns",
+          "owner": "marketing-automation",
+          "deliverable": "Campaign performance report"
+        },
+        {
+          "task": "Client project status updates",
+          "owner": "client-delivery",
+          "deliverable": "Project status summary"
+        },
+        {
+          "task": "AI model performance monitoring",
+          "owner": "ai-optimization",
+          "deliverable": "Model health report"
+        }
+      ],
+      "monthly": [
+        {
+          "task": "Comprehensive funnel analysis and bottleneck identification",
+          "owner": "data-intelligence",
+          "deliverable": "Monthly funnel analysis report"
+        },
+        {
+          "task": "Client satisfaction surveys and feedback collection",
+          "owner": "client-delivery",
+          "deliverable": "CSAT report and action items"
+        },
+        {
+          "task": "Marketing automation optimization review",
+          "owner": "marketing-automation",
+          "deliverable": "Automation health report"
+        },
+        {
+          "task": "AI optimization impact assessment",
+          "owner": "ai-optimization",
+          "deliverable": "AI impact report"
+        }
+      ],
+      "quarterly": [
+        {
+          "task": "Full funnel strategy review and goal setting",
+          "owner": "all-modules",
+          "deliverable": "Quarterly business review (QBR)"
+        },
+        {
+          "task": "Major process and workflow improvements",
+          "owner": "all-modules",
+          "deliverable": "Process improvement documentation"
+        },
+        {
+          "task": "Technology stack audit and optimization",
+          "owner": "ai-optimization",
+          "deliverable": "Tech stack audit report"
+        },
+        {
+          "task": "Client retention and LTV analysis",
+          "owner": "data-intelligence",
+          "deliverable": "Customer lifetime value report"
+        }
+      ],
+      "annual": [
+        {
+          "task": "Strategic planning and OKR setting",
+          "owner": "all-modules",
+          "deliverable": "Annual strategic plan"
+        },
+        {
+          "task": "Complete infrastructure and systems review",
+          "owner": "all-modules",
+          "deliverable": "Annual systems audit"
+        },
+        {
+          "task": "Client portfolio analysis and segmentation",
+          "owner": "data-intelligence",
+          "deliverable": "Client portfolio report"
+        },
+        {
+          "task": "Innovation roadmap and capability development",
+          "owner": "ai-optimization",
+          "deliverable": "Innovation roadmap"
+        }
+      ]
+    },
+    "cross_stage_integrations": [
+      {
+        "from_stage": "discover",
+        "to_stage": "book",
+        "integration": "Lead scoring → qualified lead handoff",
+        "automation": "n8n workflow tags high-score leads in MailerLite"
+      },
+      {
+        "from_stage": "book",
+        "to_stage": "deliver",
+        "integration": "Payment confirmation → onboarding trigger",
+        "automation": "Whop payment → n8n → GBU contract + MailerLite welcome"
+      },
+      {
+        "from_stage": "deliver",
+        "to_stage": "optimize",
+        "integration": "Project completion → performance data collection",
+        "automation": "Project data → ETL pipeline → Data Intelligence analysis"
+      },
+      {
+        "from_stage": "optimize",
+        "to_stage": "retain",
+        "integration": "Optimization insights → retention campaign targeting",
+        "automation": "AI predictions → MailerLite segment updates"
+      },
+      {
+        "from_stage": "retain",
+        "to_stage": "book",
+        "integration": "Referral or repeat purchase → new booking cycle",
+        "automation": "Existing client → expedited booking flow"
+      }
+    ]
+  }
+}

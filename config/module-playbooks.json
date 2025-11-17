@@ -1,0 +1,452 @@
+{
+  "playbooks": [
+    {
+      "id": "client-delivery",
+      "objective": "Manages end-to-end client project delivery, from onboarding through completion, ensuring consistent service quality and timely deliverables",
+      "kpis": [
+        {
+          "name": "Project completion rate within timeline",
+          "target": "95",
+          "unit": "percent"
+        },
+        {
+          "name": "Client satisfaction scores",
+          "target": "4.5",
+          "unit": "score_out_of_5"
+        },
+        {
+          "name": "Resource utilization efficiency",
+          "target": "85",
+          "unit": "percent"
+        },
+        {
+          "name": "Budget adherence",
+          "target": "95",
+          "unit": "percent"
+        },
+        {
+          "name": "Post-delivery client retention rate",
+          "target": "90",
+          "unit": "percent"
+        }
+      ],
+      "tools": [
+        {
+          "name": "Whop",
+          "role": "Payment processing and customer management",
+          "category": "payments"
+        },
+        {
+          "name": "n8n",
+          "role": "Workflow automation and orchestration",
+          "category": "automation"
+        },
+        {
+          "name": "GBU",
+          "role": "Contract generation and management",
+          "category": "legal"
+        },
+        {
+          "name": "MailerLite",
+          "role": "Client communication and onboarding sequences",
+          "category": "email"
+        }
+      ],
+      "workflow_steps": [
+        {
+          "id": "onboarding",
+          "label": "Client Onboarding",
+          "description": "Collect requirements and gather client information"
+        },
+        {
+          "id": "planning",
+          "label": "Project Planning",
+          "description": "Set up milestones and schedule deliverables"
+        },
+        {
+          "id": "allocation",
+          "label": "Resource Allocation",
+          "description": "Assign team members and manage tasks"
+        },
+        {
+          "id": "tracking",
+          "label": "Progress Tracking",
+          "description": "Monitor status updates and provide reporting"
+        },
+        {
+          "id": "delivery",
+          "label": "Delivery & Handoff",
+          "description": "Conduct quality assurance and obtain client approval"
+        }
+      ],
+      "client_inputs": [
+        "Project requirements and objectives",
+        "Budget and timeline constraints",
+        "Brand assets and guidelines",
+        "Access credentials to relevant platforms",
+        "Communication preferences"
+      ],
+      "internal_checks": [
+        "Contract signed and payment received",
+        "Resource availability confirmed",
+        "Milestone deadlines tracked",
+        "Quality assurance completed",
+        "Client feedback collected"
+      ],
+      "automations": [
+        "Whop payment → n8n → create/send GBU contract",
+        "Contract signed → n8n → send onboarding/welcome via MailerLite",
+        "Project complete → n8n → send review/referral sequence"
+      ],
+      "maintenance_cadence": {
+        "daily": ["Project status updates", "Resource monitoring"],
+        "weekly": ["Client check-ins", "Milestone reviews"],
+        "biweekly": ["Resource allocation optimization"],
+        "monthly": ["Client satisfaction surveys", "Process improvements"],
+        "quarterly": ["Full delivery pipeline analysis", "Methodology updates"]
+      }
+    },
+    {
+      "id": "marketing-automation",
+      "objective": "Orchestrates and automates marketing campaigns, lead nurturing sequences, and customer engagement workflows across multiple channels",
+      "kpis": [
+        {
+          "name": "Campaign conversion rate",
+          "target": "3.5",
+          "unit": "percent"
+        },
+        {
+          "name": "Lead-to-customer conversion ratio",
+          "target": "15",
+          "unit": "percent"
+        },
+        {
+          "name": "Email open rate",
+          "target": "25",
+          "unit": "percent"
+        },
+        {
+          "name": "Email click-through rate",
+          "target": "3.5",
+          "unit": "percent"
+        },
+        {
+          "name": "Marketing qualified leads generated",
+          "target": "100",
+          "unit": "count_per_month"
+        },
+        {
+          "name": "Return on marketing investment",
+          "target": "300",
+          "unit": "percent"
+        }
+      ],
+      "tools": [
+        {
+          "name": "MailerLite",
+          "role": "Email campaign management and automation",
+          "category": "email"
+        },
+        {
+          "name": "n8n",
+          "role": "Workflow automation and integration",
+          "category": "automation"
+        },
+        {
+          "name": "Whop",
+          "role": "Offer management and customer tracking",
+          "category": "payments"
+        },
+        {
+          "name": "CRM",
+          "role": "Lead segmentation and customer data",
+          "category": "crm"
+        }
+      ],
+      "workflow_steps": [
+        {
+          "id": "lead_generation",
+          "label": "Lead Generation",
+          "description": "Capture leads through email, SMS, and web forms"
+        },
+        {
+          "id": "segmentation",
+          "label": "Segmentation",
+          "description": "Integrate with CRM and segment audiences"
+        },
+        {
+          "id": "campaign_automation",
+          "label": "Campaign Automation",
+          "description": "Deploy multi-channel automated campaigns"
+        },
+        {
+          "id": "performance_tracking",
+          "label": "Performance Tracking",
+          "description": "Monitor analytics dashboard and engagement metrics"
+        },
+        {
+          "id": "roi_analysis",
+          "label": "ROI Analysis",
+          "description": "Attribute revenue and analyze campaign returns"
+        }
+      ],
+      "client_inputs": [
+        "Target audience definition",
+        "Campaign objectives and goals",
+        "Creative assets (copy, images, videos)",
+        "Budget allocation",
+        "Brand voice and messaging guidelines"
+      ],
+      "internal_checks": [
+        "Campaign performance meets benchmarks",
+        "Automation workflows functioning correctly",
+        "Lead quality scoring updated",
+        "Integration health verified",
+        "ROI targets achieved"
+      ],
+      "automations": [
+        "Lead capture → n8n webhook → MailerLite tag",
+        "Low-engagement lead → MailerLite reactivation sequence",
+        "Offer purchase → Whop → n8n → MailerLite customer segment"
+      ],
+      "maintenance_cadence": {
+        "daily": ["Campaign performance monitoring", "Automation health checks"],
+        "weekly": ["Optimize underperforming campaigns"],
+        "monthly": ["Comprehensive performance analysis", "Strategy adjustments"],
+        "quarterly": ["Full system audit", "Integration updates"]
+      }
+    },
+    {
+      "id": "ai-optimization",
+      "objective": "Leverages artificial intelligence and machine learning to continuously optimize business processes, client campaigns, and operational efficiency",
+      "kpis": [
+        {
+          "name": "Model accuracy rate",
+          "target": "90",
+          "unit": "percent"
+        },
+        {
+          "name": "Process efficiency gains",
+          "target": "25",
+          "unit": "percent"
+        },
+        {
+          "name": "Automated decision success rate",
+          "target": "85",
+          "unit": "percent"
+        },
+        {
+          "name": "AI-driven revenue impact",
+          "target": "50000",
+          "unit": "dollars_per_quarter"
+        },
+        {
+          "name": "Model inference speed",
+          "target": "100",
+          "unit": "milliseconds"
+        },
+        {
+          "name": "False positive rate",
+          "target": "5",
+          "unit": "percent"
+        }
+      ],
+      "tools": [
+        {
+          "name": "n8n",
+          "role": "AI workflow automation and orchestration",
+          "category": "automation"
+        },
+        {
+          "name": "MailerLite",
+          "role": "Sequence switching based on AI predictions",
+          "category": "email"
+        },
+        {
+          "name": "Whop",
+          "role": "Dynamic tier unlocking and offers",
+          "category": "payments"
+        },
+        {
+          "name": "Slack",
+          "role": "AI insights and alerts delivery",
+          "category": "communication"
+        },
+        {
+          "name": "Machine Learning Platform",
+          "role": "Model training and deployment",
+          "category": "ai"
+        }
+      ],
+      "workflow_steps": [
+        {
+          "id": "data_ingestion",
+          "label": "Data Ingestion",
+          "description": "Collect historical data, real-time feeds, and business metrics"
+        },
+        {
+          "id": "feature_engineering",
+          "label": "Feature Engineering",
+          "description": "Pattern recognition, preprocessing, and feature selection"
+        },
+        {
+          "id": "model_training",
+          "label": "Model Training",
+          "description": "Algorithm selection, hyperparameter tuning, and cross-validation"
+        },
+        {
+          "id": "prediction",
+          "label": "Prediction/Optimization",
+          "description": "Generate automated decisions and process improvements"
+        },
+        {
+          "id": "monitoring",
+          "label": "Performance Monitoring",
+          "description": "Feedback loop analysis, model retraining, and A/B testing"
+        }
+      ],
+      "client_inputs": [
+        "Business objectives and success criteria",
+        "Historical performance data",
+        "Current process documentation",
+        "Constraints and business rules",
+        "Acceptable risk parameters"
+      ],
+      "internal_checks": [
+        "Model performance within thresholds",
+        "Data drift detection and alerts",
+        "Feature importance validated",
+        "Prediction accuracy verified",
+        "Automated decisions audited"
+      ],
+      "automations": [
+        "Detect low engagement → switch MailerLite sequence",
+        "High-score lead → unlock Whop bonus/higher tier",
+        "Weekly AI optimization report → Slack"
+      ],
+      "maintenance_cadence": {
+        "daily": ["Model performance monitoring", "Anomaly detection"],
+        "weekly": ["Feature importance analysis", "Data drift detection"],
+        "biweekly": ["Model retraining", "Validation"],
+        "monthly": ["Algorithm performance comparison", "Optimization"],
+        "quarterly": ["AI strategy review", "New capability development"]
+      }
+    },
+    {
+      "id": "data-intelligence",
+      "objective": "Collects, processes, and analyzes business data to provide actionable insights for operations and client performance optimization",
+      "kpis": [
+        {
+          "name": "Data quality and completeness",
+          "target": "98",
+          "unit": "percent"
+        },
+        {
+          "name": "Report generation timeliness",
+          "target": "95",
+          "unit": "percent"
+        },
+        {
+          "name": "Insight accuracy score",
+          "target": "90",
+          "unit": "percent"
+        },
+        {
+          "name": "Data pipeline uptime",
+          "target": "99.5",
+          "unit": "percent"
+        },
+        {
+          "name": "Dashboard engagement rate",
+          "target": "70",
+          "unit": "percent"
+        },
+        {
+          "name": "Business impact of data-driven decisions",
+          "target": "40000",
+          "unit": "dollars_per_quarter"
+        }
+      ],
+      "tools": [
+        {
+          "name": "Google Sheets",
+          "role": "Data storage and ETL destination",
+          "category": "data"
+        },
+        {
+          "name": "n8n",
+          "role": "ETL orchestration and data alerts",
+          "category": "automation"
+        },
+        {
+          "name": "Data Studio",
+          "role": "Dashboard creation and visualization",
+          "category": "visualization"
+        },
+        {
+          "name": "Slack",
+          "role": "Alert notifications for data anomalies",
+          "category": "communication"
+        },
+        {
+          "name": "CRM",
+          "role": "Customer data source",
+          "category": "crm"
+        }
+      ],
+      "workflow_steps": [
+        {
+          "id": "data_collection",
+          "label": "Data Collection",
+          "description": "Gather data from CRM, analytics, social media, and other sources"
+        },
+        {
+          "id": "data_processing",
+          "label": "Data Processing",
+          "description": "Run ETL pipelines, cleanse data, and validate quality"
+        },
+        {
+          "id": "analysis",
+          "label": "Analysis & Modeling",
+          "description": "Apply machine learning, statistical models, and pattern recognition"
+        },
+        {
+          "id": "insight_generation",
+          "label": "Insight Generation",
+          "description": "Generate predictive analytics, identify trends, and create recommendations"
+        },
+        {
+          "id": "reporting",
+          "label": "Reporting & Visualization",
+          "description": "Build interactive dashboards, automate reports, and configure alert systems"
+        }
+      ],
+      "client_inputs": [
+        "Data access credentials",
+        "Reporting requirements and KPIs",
+        "Business questions to answer",
+        "Visualization preferences",
+        "Alert thresholds and triggers"
+      ],
+      "internal_checks": [
+        "Data pipeline health verified",
+        "Quality checks passed",
+        "Report accuracy validated",
+        "Dashboard performance optimized",
+        "User feedback incorporated"
+      ],
+      "automations": [
+        "Nightly ETL from sources → Google Sheets",
+        "Data drift > 5% → n8n → Slack alert to ops",
+        "Dashboard refresh cadence → Data Studio"
+      ],
+      "maintenance_cadence": {
+        "daily": ["Data pipeline monitoring", "Quality checks"],
+        "weekly": ["Report accuracy validation", "User feedback review"],
+        "biweekly": ["Model performance evaluation", "Tuning"],
+        "monthly": ["Data source integration health checks"],
+        "quarterly": ["Full analytics infrastructure audit", "Capability expansion"]
+      }
+    }
+  ]
+}

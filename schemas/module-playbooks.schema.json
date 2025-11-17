@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Module Playbooks Configuration",
+  "description": "Schema for module-playbooks.json configuration file",
+  "type": "object",
+  "required": ["playbooks"],
+  "properties": {
+    "playbooks": {
+      "type": "array",
+      "description": "Array of module playbook definitions",
+      "items": {
+        "type": "object",
+        "required": [
+          "id",
+          "objective",
+          "kpis",
+          "tools",
+          "workflow_steps",
+          "client_inputs",
+          "internal_checks",
+          "automations",
+          "maintenance_cadence"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "Unique identifier for the module",
+            "pattern": "^[a-z-]+$"
+          },
+          "objective": {
+            "type": "string",
+            "description": "Primary objective of the module"
+          },
+          "kpis": {
+            "type": "array",
+            "description": "Key performance indicators",
+            "items": {
+              "type": "object",
+              "required": ["name", "target", "unit"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "KPI name"
+                },
+                "target": {
+                  "type": "string",
+                  "description": "Target value"
+                },
+                "unit": {
+                  "type": "string",
+                  "description": "Unit of measurement"
+                }
+              }
+            }
+          },
+          "tools": {
+            "type": "array",
+            "description": "Tools used by the module",
+            "items": {
+              "type": "object",
+              "required": ["name", "role", "category"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Tool name"
+                },
+                "role": {
+                  "type": "string",
+                  "description": "Tool's role in the module"
+                },
+                "category": {
+                  "type": "string",
+                  "description": "Tool category"
+                }
+              }
+            }
+          },
+          "workflow_steps": {
+            "type": "array",
+            "description": "Workflow steps for the module",
+            "items": {
+              "type": "object",
+              "required": ["id", "label", "description"],
+              "properties": {
+                "id": {
+                  "type": "string",
+                  "description": "Step identifier",
+                  "pattern": "^[a-z_]+$"
+                },
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable step label"
+                },
+                "description": {
+                  "type": "string",
+                  "description": "Step description"
+                }
+              }
+            }
+          },
+          "client_inputs": {
+            "type": "array",
+            "description": "Required inputs from clients",
+            "items": {
+              "type": "string"
+            }
+          },
+          "internal_checks": {
+            "type": "array",
+            "description": "Internal validation checks",
+            "items": {
+              "type": "string"
+            }
+          },
+          "automations": {
+            "type": "array",
+            "description": "Automation workflows",
+            "items": {
+              "type": "string"
+            }
+          },
+          "maintenance_cadence": {
+            "type": "object",
+            "description": "Maintenance schedule",
+            "properties": {
+              "daily": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "weekly": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "biweekly": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "monthly": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "quarterly": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -351,3 +351,236 @@ For questions or proposed changes to shared config:
 3. Update this integration guide when schemas change
 
 **Remember:** This repo is the contract between all Audio Jones applications. Changes here affect the entire ecosystem.
+
+---
+
+## Module Playbooks and Funnel Map Integration
+
+### New Configuration Files
+
+The hub now includes machine-readable playbooks and funnel governance:
+
+```
+config/
+├── module-playbooks.json  # Detailed module workflows, KPIs, tools
+└── funnel-map.json        # Complete funnel stages and cadence
+```
+
+### Using Module Playbooks
+
+**TypeScript Library:**
+```typescript
+// Install the hub as a dependency or use git submodule
+import {
+  getModulePlaybook,
+  loadModulePlaybooks,
+  validateModuleReferences
+} from '@ajdigital/automation-hub/lib/playbooks';
+
+// Load a specific playbook
+const clientDelivery = getModulePlaybook('client-delivery');
+console.log(clientDelivery.objective);
+console.log(clientDelivery.kpis);
+console.log(clientDelivery.workflow_steps);
+
+// Load all playbooks
+const allPlaybooks = loadModulePlaybooks();
+```
+
+**Use Cases by Repo:**
+
+1. **audiojones.com (Marketing Site)**
+   - Display detailed module workflows on `/systems/[module]` pages
+   - Show KPIs and success metrics to prospects
+   - Render tool integrations (Whop, MailerLite, n8n)
+   
+   ```typescript
+   const module = getModulePlaybook('marketing-automation');
+   // Render: module.workflow_steps as a visual flow
+   // Display: module.kpis as "What you can expect"
+   // Show: module.tools for integration badges
+   ```
+
+2. **audiojones-client (Client Portal)**
+   - Show project workflow progress based on `workflow_steps`
+   - Display relevant KPIs for client's active services
+   - Render maintenance cadence (when to expect updates)
+   
+   ```typescript
+   const playbook = getModulePlaybook(service.module);
+   // Timeline: Map service.status to playbook.workflow_steps
+   // Expectations: Show playbook.maintenance_cadence to clients
+   ```
+
+3. **audiojones-admin (Admin Portal)**
+   - Use playbooks for project planning and resource allocation
+   - Track internal checks and client inputs
+   - Monitor KPI compliance across all projects
+   
+   ```typescript
+   const playbook = getModulePlaybook(project.module);
+   // Checklist: Display playbook.internal_checks
+   // Client forms: Generate from playbook.client_inputs
+   // Analytics: Compare actual vs target KPIs
+   ```
+
+4. **Automation/Agents (n8n, AI)**
+   - Validate automation workflows against defined flows
+   - Trigger maintenance tasks based on cadence
+   - Monitor KPI thresholds and alert on deviations
+   
+   ```typescript
+   const playbook = getModulePlaybook('ai-optimization');
+   // Scheduler: Set up playbook.maintenance_cadence tasks
+   // Validation: Check playbook.automations are active
+   ```
+
+### Using Funnel Map
+
+```typescript
+import {
+  getFunnelStage,
+  getCadenceTasks,
+  getModulesForStage,
+  getStagesForModule
+} from '@ajdigital/automation-hub/lib/playbooks';
+
+// Load funnel stages
+const discoverStage = getFunnelStage('discover');
+console.log(discoverStage.primary_module_ids); // ['marketing-automation', 'data-intelligence']
+
+// Get weekly maintenance tasks
+const weeklyTasks = getCadenceTasks('weekly');
+// weeklyTasks.forEach(task => scheduleTask(task));
+
+// Find which stages use a specific module
+const stages = getStagesForModule('client-delivery');
+// stages: [{ id: 'book', ... }, { id: 'deliver', ... }, { id: 'retain', ... }]
+```
+
+**Use Cases:**
+
+1. **Status Dashboard** (Admin Portal)
+   - Visualize the complete customer journey
+   - Show stage-by-stage conversion metrics
+   - Display cross-stage integrations and automations
+   
+   ```typescript
+   const funnel = loadFunnelMap();
+   // Render: funnel.funnel.stages as a visual pipeline
+   // Track: conversion rates between stages
+   // Monitor: funnel.funnel.cross_stage_integrations health
+   ```
+
+2. **Task Scheduling** (Admin/Automation)
+   - Schedule recurring tasks based on cadence
+   - Assign deliverables to appropriate module owners
+   - Automate weekly/monthly/quarterly reviews
+   
+   ```typescript
+   const quarterlyTasks = getCadenceTasks('quarterly');
+   quarterlyTasks.forEach(task => {
+     scheduleTask({
+       name: task.task,
+       assignee: task.owner,
+       deliverable: task.deliverable,
+       recurrence: 'quarterly'
+     });
+   });
+   ```
+
+3. **Automation Health** (n8n, Monitoring)
+   - Validate that all cross-stage automations are active
+   - Monitor integration points between stages
+   - Alert when automations fail or metrics drop
+   
+   ```typescript
+   const integrations = funnel.funnel.cross_stage_integrations;
+   integrations.forEach(integration => {
+     validateAutomation(integration.automation);
+   });
+   ```
+
+### JSON Schema Validation
+
+Validate configuration files programmatically:
+
+```bash
+# Run validation script
+npm run validate:configs
+```
+
+Or in CI/CD:
+```yaml
+# .github/workflows/validate.yml
+- name: Validate configs
+  run: npm run validate:configs
+```
+
+### TypeScript Types
+
+Build the library to generate TypeScript types:
+
+```bash
+npm install
+npm run build
+```
+
+This creates `dist/lib/playbooks.d.ts` with full type definitions for:
+- `ModulePlaybook`
+- `FunnelStage`
+- `CadenceTask`
+- All helper functions
+
+### Migration Guide
+
+When updating from the previous config format:
+
+1. **Module metadata remains in `config/systems/modules.json`**
+   - Use for basic module info (id, name, description, personas)
+   
+2. **Detailed workflows now in `config/module-playbooks.json`**
+   - Use for KPIs, tools, workflow steps, automations
+   
+3. **Import both where needed:**
+   ```typescript
+   import modules from './config/systems/modules.json';
+   import { getModulePlaybook } from './lib/playbooks';
+   
+   // Basic info from modules.json
+   const moduleInfo = modules.modules.find(m => m.id === 'client-delivery');
+   
+   // Detailed workflow from playbooks
+   const playbook = getModulePlaybook('client-delivery');
+   ```
+
+### Example: Complete Integration
+
+```typescript
+// In audiojones-client/lib/modules.ts
+
+import modulesConfig from '@ajdigital/automation-hub/config/systems/modules.json';
+import { getModulePlaybook } from '@ajdigital/automation-hub/lib/playbooks';
+
+export function getCompleteModuleInfo(moduleId: string) {
+  const basicInfo = modulesConfig.modules.find(m => m.id === moduleId);
+  const playbook = getModulePlaybook(moduleId);
+  
+  return {
+    // From modules.json
+    id: basicInfo.id,
+    name: basicInfo.name,
+    description: basicInfo.longDescription,
+    personas: basicInfo.suggestedPersonas,
+    funnelStage: basicInfo.funnelStage,
+    
+    // From module-playbooks.json
+    objective: playbook.objective,
+    kpis: playbook.kpis,
+    workflow: playbook.workflow_steps,
+    tools: playbook.tools,
+    maintenance: playbook.maintenance_cadence,
+    automations: playbook.automations
+  };
+}
+```
