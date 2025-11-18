@@ -3,193 +3,163 @@
 # Declarative event routing specification for automation modules
 
 version: "1.0"
-description: Maps portal events to module actions
 
-eventRoutes:
+# Event routing configuration
+# Maps event names to module handlers with operational parameters
+events:
   # Booking Lifecycle Events
-  - event: booking.created
+  booking.created:
     modules:
       - client-delivery
       - marketing-automation
       - data-intelligence
     priority: high
-    description: New booking initiates delivery workflow, marketing touch, and analytics
+    retries: 3
+    timeoutMs: 30000
 
-  - event: booking.status_updated
+  booking.status_updated:
     modules:
       - client-delivery
       - data-intelligence
-    conditions:
-      - field: newStatus
-        operator: in
-        values: [pending, approved, in_progress, completed, cancelled]
     priority: medium
-    description: Status changes trigger notifications and metric updates
+    retries: 3
+    timeoutMs: 20000
 
-  - event: booking.status_changed_to_pending_payment
+  booking.approved:
     modules:
+      - client-delivery
       - marketing-automation
     priority: high
-    description: Payment pending triggers reminder sequence
+    retries: 3
+    timeoutMs: 30000
 
-  - event: booking.completed
+  booking.completed:
     modules:
       - client-delivery
       - marketing-automation
       - data-intelligence
     priority: high
-    description: Completion triggers delivery confirmation, survey, and revenue tracking
+    retries: 3
+    timeoutMs: 30000
+
+  booking.cancelled:
+    modules:
+      - client-delivery
+      - data-intelligence
+    priority: medium
+    retries: 2
+    timeoutMs: 20000
 
   # Payment Events
-  - event: payment.completed
+  payment.intent_created:
+    modules:
+      - data-intelligence
+    priority: medium
+    retries: 2
+    timeoutMs: 15000
+
+  payment.completed:
     modules:
       - client-delivery
+      - marketing-automation
       - data-intelligence
     priority: high
-    description: Payment success enables project delivery and updates financials
+    retries: 5
+    timeoutMs: 30000
 
-  - event: payment.failed
+  payment.failed:
     modules:
       - marketing-automation
+      - data-intelligence
     priority: high
-    description: Failed payment triggers recovery workflow
+    retries: 3
+    timeoutMs: 20000
 
   # Asset Events
-  - event: asset.uploaded
+  asset.uploaded:
     modules:
       - client-delivery
       - ai-optimization
       - data-intelligence
-    conditions:
-      - field: fileType
-        operator: matches
-        pattern: "^(audio|video|image)/"
     priority: medium
-    description: Asset uploads trigger processing, AI analysis, and storage metrics
+    retries: 3
+    timeoutMs: 60000
 
-  - event: asset.final_delivery
+  asset.processed:
+    modules:
+      - client-delivery
+      - ai-optimization
+    priority: medium
+    retries: 2
+    timeoutMs: 30000
+
+  asset.delivered:
     modules:
       - client-delivery
       - marketing-automation
     priority: high
-    description: Final deliverable triggers completion workflow
+    retries: 3
+    timeoutMs: 30000
 
   # User Events
-  - event: user.registered
+  user.registered:
     modules:
       - marketing-automation
     priority: medium
-    description: New user enters welcome sequence
+    retries: 2
+    timeoutMs: 15000
 
-  - event: user.inactive
+  user.inactive:
     modules:
       - marketing-automation
-    schedule: weekly
     priority: low
-    description: Inactive users enter re-engagement campaign
+    retries: 1
+    timeoutMs: 10000
 
   # Content Events
-  - event: content.submitted_for_review
+  content.submitted_for_review:
     modules:
       - ai-optimization
     priority: medium
-    description: Content ready for AI quality check
+    retries: 2
+    timeoutMs: 45000
 
-  # Service Configuration Events
-  - event: service.created
+  # Admin/Tenant Events
+  tenant.config_updated:
     modules:
       - data-intelligence
     priority: low
-    description: New service tracked for catalog analytics
+    retries: 2
+    timeoutMs: 15000
 
-  - event: service.whop_synced
+  reporting.snapshot_generated:
     modules:
       - data-intelligence
     priority: low
-    description: Whop product sync updates catalog
+    retries: 1
+    timeoutMs: 20000
 
-# Module Dependencies
-moduleDependencies:
-  client-delivery:
-    required:
-      - firebase
-      - email_service
-    optional:
-      - slack_webhook
-      - n8n
+  service.created:
+    modules:
+      - data-intelligence
+    priority: low
+    retries: 2
+    timeoutMs: 15000
 
-  marketing-automation:
-    required:
-      - email_service
-      - firebase
-    optional:
-      - analytics_engine
-      - n8n
+  service.whop_synced:
+    modules:
+      - data-intelligence
+    priority: low
+    retries: 2
+    timeoutMs: 15000
 
-  ai-optimization:
-    required:
-      - ai_engine
-      - firebase
-    optional:
-      - file_storage
-      - n8n
+# Dead letter queue configuration
+deadLetter:
+  enabled: true
+  retentionDays: 30
 
-  data-intelligence:
-    required:
-      - firestore
-      - analytics_engine
-    optional:
-      - redis_cache
-      - bigquery
-      - n8n
-
-# Event Priority Levels
-priorityHandling:
-  high:
-    maxRetries: 5
-    retryDelay: exponential
-    alertOnFailure: true
-    timeout: 30s
-
-  medium:
-    maxRetries: 3
-    retryDelay: linear
-    alertOnFailure: false
-    timeout: 60s
-
-  low:
-    maxRetries: 1
-    retryDelay: none
-    alertOnFailure: false
-    timeout: 120s
-
-# Error Handling
-errorHandling:
-  deadLetterQueue:
-    enabled: true
-    collection: failed_events
-    retentionDays: 30
-
-  fallback:
-    logToFirestore: true
-    notifyAdmin: true
-    continueProcessing: false
-
-# Observability
-observability:
-  tracing:
-    enabled: true
-    provider: firebase_tracing
-
-  metrics:
-    enabled: true
-    collections:
-      - event_throughput
-      - module_latency
-      - error_rates
-
-  logging:
-    level: info
-    destinations:
-      - firebase_logs
-      - console
+# Global defaults (optional, can be overridden per event)
+defaults:
+  priority: medium
+  retries: 2
+  timeoutMs: 20000
