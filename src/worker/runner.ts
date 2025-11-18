@@ -11,6 +11,25 @@
 import { routeEvent, getRouterConfig } from '../lib/router.js';
 import { moduleHandlers } from './module-handlers.js';
 import { WorkerInboxAdapter } from './types.js';
+import { InMemoryInboxAdapter } from './inmemory-inbox.js';
+import { FirestoreInboxAdapter } from './firestore-inbox.js';
+
+/**
+ * Get inbox adapter based on INBOX_DRIVER environment variable
+ * 
+ * @returns Configured inbox adapter
+ */
+function getInboxAdapter(): WorkerInboxAdapter {
+  const driver = process.env.INBOX_DRIVER || 'memory';
+  
+  if (driver === 'firestore') {
+    console.log('[Worker] Using Firestore inbox adapter');
+    return new FirestoreInboxAdapter();
+  }
+  
+  console.log('[Worker] Using in-memory inbox adapter');
+  return new InMemoryInboxAdapter();
+}
 
 /**
  * Process a batch of events from the inbox
@@ -94,17 +113,19 @@ export async function processBatch(
  * Run worker once (process one batch and exit)
  * Useful for testing and cron-style invocation
  * 
- * @param inbox - Inbox adapter to use
+ * @param inbox - Optional inbox adapter (defaults to env-based selection)
  * @param batchSize - Maximum events to process
  */
 export async function runOnce(
-  inbox: WorkerInboxAdapter,
+  inbox?: WorkerInboxAdapter,
   batchSize = 10
 ): Promise<void> {
+  const adapter = inbox || getInboxAdapter();
+  
   console.log('[Worker] Starting single run...\n');
   
   try {
-    await processBatch(inbox, batchSize);
+    await processBatch(adapter, batchSize);
     console.log('\n[Worker] Single run complete');
   } catch (error) {
     console.error(
@@ -119,16 +140,17 @@ export async function runOnce(
  * Run worker in continuous loop
  * Processes batches until stopped
  * 
- * @param inbox - Inbox adapter to use
+ * @param inbox - Optional inbox adapter (defaults to env-based selection)
  * @param options - Worker configuration
  */
 export async function runContinuous(
-  inbox: WorkerInboxAdapter,
+  inbox?: WorkerInboxAdapter,
   options: {
     batchSize?: number;
     pollIntervalMs?: number;
   } = {}
 ): Promise<void> {
+  const adapter = inbox || getInboxAdapter();
   const { batchSize = 10, pollIntervalMs = 5000 } = options;
   
   console.log('[Worker] Starting continuous mode...');
@@ -150,7 +172,7 @@ export async function runContinuous(
   // Main processing loop
   while (running) {
     try {
-      await processBatch(inbox, batchSize);
+      await processBatch(adapter, batchSize);
     } catch (error) {
       console.error(
         '[Worker] Batch processing error:',

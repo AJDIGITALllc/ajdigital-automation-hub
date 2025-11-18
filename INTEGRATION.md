@@ -107,12 +107,47 @@ When events are received, the hub triggers:
 - **Health Check**: `/health` (public)
 - **Notifications**: Slack/Discord alerts for errors and warnings
 
+### Worker Modes
+
+The automation hub worker can run in two modes:
+
+#### 1. In-Memory Mode (Default - Testing)
+```bash
+npm run worker:run
+# or
+INBOX_DRIVER=memory npm run worker:run
+```
+Uses in-memory queue. Suitable for local testing with sample events.
+
+#### 2. Firestore Mode (Production)
+```bash
+npm run worker:run:firestore
+# or
+INBOX_DRIVER=firestore npm run worker:run
+```
+
+Reads events from Firestore collections:
+- **portalEvents**: Events from audiojones-client
+- **adminEvents**: Events from audiojones-admin
+
+**Required Environment Variables for Firestore Mode:**
+- `FIREBASE_PROJECT_ID`: Firebase project ID
+- `FIREBASE_CLIENT_EMAIL`: Service account email
+- `FIREBASE_PRIVATE_KEY`: Service account private key (with escaped newlines: `\\n`)
+
+**Event Processing:**
+- Polls both `portalEvents` and `adminEvents` collections
+- Filters for unprocessed events (`processed != true && failed != true`)
+- Routes events through `modules-router.yaml` configuration
+- Marks events as `processed: true` on success
+- Marks events as `failed: true` with error message on failure
+
 ### Environment Configuration
 
 See `.env.schema.json` for complete variable documentation.
 
 Key integrations:
-- Firebase Admin (optional): For shared database access
+- Firebase Admin: For Firestore inbox adapter (portal/admin events)
 - n8n: Workflow automation engine
 - Whop/Stripe: Payment provider webhooks (future)
 - MailerLite: Email automation (future direct integration)
