@@ -12,6 +12,7 @@
     "validate:router": "tsx scripts/validate-router.ts",
     "validate": "npm run validate:router",
     "governance": "tsc && node dist/scripts/run-governance.js",
+    "worker:run": "tsx scripts/run-worker.ts",
     "test": "echo \"No tests yet\" && exit 0"
   },
   "repository": {
