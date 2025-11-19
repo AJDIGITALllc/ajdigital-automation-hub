@@ -110,6 +110,48 @@ function validateCronAuth(req: Request, res: Response, next: NextFunction): void
 // ============================================================================
 
 /**
+ * POST /api/events/intake
+ * Generic event intake endpoint for all normalized portal events
+ */
+app.post('/api/events/intake', validateInternalAuth, async (req: Request, res: Response) => {
+  try {
+    const event = req.body;
+
+    // Basic validation
+    if (!event.id || !event.name || !event.source || !event.occurredAt) {
+      return res.status(400).json({
+        error: 'Invalid event structure',
+        details: 'Event must include id, name, source, and occurredAt fields',
+      } as ErrorResponse);
+    }
+
+    webhookLogger.info('event.intake', `Received event: ${event.name} from ${event.source}`, {
+      eventId: event.id,
+      metadata: { eventName: event.name, source: event.source },
+    });
+
+    // Route through automation system
+    const { routeEvent } = await import('./lib/router.js');
+    await routeEvent(event);
+
+    res.status(200).json({ 
+      success: true, 
+      eventId: event.id,
+      received: true,
+    });
+  } catch (error) {
+    webhookLogger.error('event.intake.error', 'Failed to process event', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    res.status(500).json({
+      error: 'Failed to process event',
+      details: error instanceof Error ? error.message : String(error),
+    } as ErrorResponse);
+  }
+});
+
+/**
  * POST /api/events/booking-updated
  * Receives booking status change events from client portal
  */
