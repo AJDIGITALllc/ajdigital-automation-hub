@@ -35,7 +35,7 @@ export type EventName = string;
 /**
  * Event source identifies which system originated the event
  */
-export type EventSource = "client-portal" | "admin-portal" | "system" | "worker";
+export type EventSource = "client-portal" | "admin-portal" | "system" | "worker" | "cal";
 
 /**
  * Base event structure - all events must conform to this shape

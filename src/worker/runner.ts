@@ -11,25 +11,7 @@
 import { routeEvent, getRouterConfig } from '../lib/router.js';
 import { moduleHandlers } from './module-handlers.js';
 import { WorkerInboxAdapter } from './types.js';
-import { InMemoryInboxAdapter } from './inmemory-inbox.js';
-import { FirestoreInboxAdapter } from './firestore-inbox.js';
-
-/**
- * Get inbox adapter based on INBOX_DRIVER environment variable
- * 
- * @returns Configured inbox adapter
- */
-function getInboxAdapter(): WorkerInboxAdapter {
-  const driver = process.env.INBOX_DRIVER || 'memory';
-  
-  if (driver === 'firestore') {
-    console.log('[Worker] Using Firestore inbox adapter');
-    return new FirestoreInboxAdapter();
-  }
-  
-  console.log('[Worker] Using in-memory inbox adapter');
-  return new InMemoryInboxAdapter();
-}
+import { createInboxAdapter } from './inbox-factory.js';
 
 /**
  * Process a batch of events from the inbox
@@ -120,7 +102,7 @@ export async function runOnce(
   inbox?: WorkerInboxAdapter,
   batchSize = 10
 ): Promise<void> {
-  const adapter = inbox || getInboxAdapter();
+  const adapter = inbox || createInboxAdapter();
   
   console.log('[Worker] Starting single run...\n');
   
@@ -150,7 +132,7 @@ export async function runContinuous(
     pollIntervalMs?: number;
   } = {}
 ): Promise<void> {
-  const adapter = inbox || getInboxAdapter();
+  const adapter = inbox || createInboxAdapter();
   const { batchSize = 10, pollIntervalMs = 5000 } = options;
   
   console.log('[Worker] Starting continuous mode...');

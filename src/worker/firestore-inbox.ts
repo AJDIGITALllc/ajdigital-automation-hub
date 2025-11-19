@@ -37,6 +37,29 @@ interface FirestoreEventDoc {
  * Marks documents as processed or failed after handling
  */
 export class FirestoreInboxAdapter implements WorkerInboxAdapter {
+  private readonly portalCollectionName: string;
+  private readonly adminCollectionName: string;
+  private readonly maxBatchSize: number;
+  
+  constructor(options?: {
+    portalCollectionName?: string;
+    adminCollectionName?: string;
+    maxBatchSize?: number;
+  }) {
+    this.portalCollectionName = options?.portalCollectionName ?? 'portalEvents';
+    this.adminCollectionName = options?.adminCollectionName ?? 'adminEvents';
+    this.maxBatchSize = options?.maxBatchSize ?? 20;
+    
+    // Lazy validation - will throw when db() is called if creds missing
+    try {
+      db();
+    } catch (error) {
+      throw new Error(
+        `FirestoreInboxAdapter initialization failed: ${error instanceof Error ? error.message : String(error)}`
+      );
+    }
+  }
+  
   private get db() {
     return db();
   }
@@ -48,13 +71,14 @@ export class FirestoreInboxAdapter implements WorkerInboxAdapter {
    * @returns Array of BaseEvent ready for processing
    */
   async pollEvents(limit: number): Promise<BaseEvent[]> {
-    const half = Math.max(1, Math.floor(limit / 2));
+    const effectiveLimit = Math.min(limit, this.maxBatchSize);
+    const half = Math.max(1, Math.floor(effectiveLimit / 2));
     const events: BaseEvent[] = [];
     
     // Poll from portalEvents
     try {
       const portalSnapshot = await this.db
-        .collection('portalEvents')
+        .collection(this.portalCollectionName)
         .where('processed', '!=', true)
         .where('failed', '!=', true)
         .orderBy('occurredAt', 'asc')
@@ -62,14 +86,14 @@ export class FirestoreInboxAdapter implements WorkerInboxAdapter {
         .get();
       
       for (const doc of portalSnapshot.docs) {
-        const event = this.mapDocToEvent(doc.id, doc.data() as FirestoreEventDoc, 'portalEvents');
+        const event = this.mapDocToEvent(doc.id, doc.data() as FirestoreEventDoc, this.portalCollectionName);
         if (event) {
           events.push(event);
         }
       }
     } catch (error) {
       console.error(
-        '[FirestoreInbox] Error polling portalEvents:',
+        `[FirestoreInbox] Error polling ${this.portalCollectionName}:`,
         error instanceof Error ? error.message : String(error)
       );
     }
@@ -77,7 +101,7 @@ export class FirestoreInboxAdapter implements WorkerInboxAdapter {
     // Poll from adminEvents
     try {
       const adminSnapshot = await this.db
-        .collection('adminEvents')
+        .collection(this.adminCollectionName)
         .where('processed', '!=', true)
         .where('failed', '!=', true)
         .orderBy('occurredAt', 'asc')
@@ -85,14 +109,14 @@ export class FirestoreInboxAdapter implements WorkerInboxAdapter {
         .get();
       
       for (const doc of adminSnapshot.docs) {
-        const event = this.mapDocToEvent(doc.id, doc.data() as FirestoreEventDoc, 'adminEvents');
+        const event = this.mapDocToEvent(doc.id, doc.data() as FirestoreEventDoc, this.adminCollectionName);
         if (event) {
           events.push(event);
         }
       }
     } catch (error) {
       console.error(
-        '[FirestoreInbox] Error polling adminEvents:',
+        `[FirestoreInbox] Error polling ${this.adminCollectionName}:`,
         error instanceof Error ? error.message : String(error)
       );
     }
@@ -149,7 +173,7 @@ export class FirestoreInboxAdapter implements WorkerInboxAdapter {
   async markProcessed(eventId: string): Promise<void> {
     try {
       // Try to find the event in either collection
-      const collections = ['portalEvents', 'adminEvents'];
+      const collections = [this.portalCollectionName, this.adminCollectionName];
       
       for (const collectionName of collections) {
         try {
@@ -160,6 +184,7 @@ export class FirestoreInboxAdapter implements WorkerInboxAdapter {
             await docRef.update({
               processed: true,
               processedAt: new Date().toISOString(),
+              status: 'processed',
             });
             
             console.log(`[FirestoreInbox] Marked ${eventId} as processed in ${collectionName}`);
@@ -188,7 +213,7 @@ export class FirestoreInboxAdapter implements WorkerInboxAdapter {
   async markFailed(eventId: string, error: Error): Promise<void> {
     try {
       // Try to find the event in either collection
-      const collections = ['portalEvents', 'adminEvents'];
+      const collections = [this.portalCollectionName, this.adminCollectionName];
       
       for (const collectionName of collections) {
         try {
@@ -199,7 +224,12 @@ export class FirestoreInboxAdapter implements WorkerInboxAdapter {
             await docRef.update({
               failed: true,
               failedAt: new Date().toISOString(),
-              failureMessage: error.message?.slice(0, 500),
+              status: 'failed',
+              lastError: {
+                message: error.message?.slice(0, 500),
+                stack: error.stack?.slice(0, 1000),
+                timestamp: new Date().toISOString(),
+              },
             });
             
             console.error(`[FirestoreInbox] Marked ${eventId} as failed in ${collectionName}: ${error.message}`);

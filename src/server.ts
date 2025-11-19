@@ -313,6 +313,51 @@ app.get('/api/cron/governance', validateCronAuth, async (req: Request, res: Resp
 });
 
 // ============================================================================
+// Cal.com Webhook
+// ============================================================================
+
+/**
+ * POST /api/webhooks/cal
+ * Receives webhooks from Cal.com for booking lifecycle events
+ */
+app.post('/api/webhooks/cal', async (req: Request, res: Response) => {
+  try {
+    const payload = req.body;
+    const signature = req.headers['x-cal-signature'] as string | undefined;
+
+    // Verify webhook signature if configured
+    if (process.env.CAL_WEBHOOK_SECRET && signature) {
+      const { verifyWebhookSignature } = await import('./handlers/cal-webhook.js');
+      const isValid = verifyWebhookSignature(
+        JSON.stringify(payload),
+        signature,
+        process.env.CAL_WEBHOOK_SECRET
+      );
+
+      if (!isValid) {
+        webhookLogger.error('cal.webhook.invalid_signature', 'Invalid Cal.com webhook signature');
+        return res.status(401).json({ error: 'Invalid signature' });
+      }
+    }
+
+    // Handle the webhook
+    const { handleCalWebhook } = await import('./handlers/cal-webhook.js');
+    await handleCalWebhook(payload);
+
+    res.status(200).json({ success: true, received: true });
+  } catch (error) {
+    webhookLogger.error('cal.webhook.error', 'Failed to process Cal.com webhook', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+
+    res.status(500).json({
+      error: 'Failed to process webhook',
+      details: error instanceof Error ? error.message : String(error),
+    } as ErrorResponse);
+  }
+});
+
+// ============================================================================
 // Health Check
 // ============================================================================
 

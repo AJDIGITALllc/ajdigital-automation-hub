@@ -76,6 +76,18 @@ python scripts/validate_repos.py
 python scripts/validate_repos.py --repo audiojones-system-modules
 ```
 
+### Cal.com Integration
+```powershell
+# Sync event types to Cal.com (one-time or scheduled)
+npm run cal:sync-event-types
+
+# Start automation hub server (handles Cal.com webhooks)
+npm start
+
+# Or in development with hot reload
+npm run dev
+```
+
 ## Directory Structure
 
 ```
@@ -283,6 +295,154 @@ Get-Content config/modules/*.yaml | ConvertFrom-Yaml
 # Validate against schema (when available)
 python scripts/validate_modules.py
 `
+
+## Integrations
+
+### Cal.com Scheduling
+
+The automation hub is the **single source of truth** for Cal.com scheduling automation. Frontend applications (audiojones.com, client/admin portals) only use embeds and links.
+
+#### Event Type Management
+
+All Cal.com booking types are defined in `src/config/cal-event-types.ts`:
+
+```typescript
+import { CAL_EVENT_TYPES, getEventTypeBySlug } from '@ajdigital/automation-hub';
+
+// 15+ booking types covering:
+// - Discovery calls and consultations
+// - Client onboarding (standard + VIP)
+// - Project delivery sessions
+// - Support and training
+// - Strategic planning
+// - Marketing and optimization reviews
+```
+
+**Sync to Cal.com**:
+```powershell
+npm run cal:sync-event-types
+```
+
+This job creates/updates event types on Cal.com to match your config. Run on-demand or via cron.
+
+#### Webhook Processing
+
+Cal.com webhooks are received at `POST /api/webhooks/cal` and automatically:
+- Map to internal events (`booking.created`, `booking.rescheduled`, etc.)
+- Route through module handlers via `modules-router.yaml`
+- Trigger downstream automation (CRM updates, email, project creation)
+
+**Webhook Configuration** (in Cal.com dashboard):
+- URL: `https://your-automation-hub.com/api/webhooks/cal`
+- Events: `booking.created`, `booking.rescheduled`, `booking.cancelled`, `meeting.ended`
+- Optional: Set `CAL_WEBHOOK_SECRET` for signature verification
+
+**Environment Variables**:
+- `CAL_API_KEY` → Cal.com API key (required)
+- `CAL_API_BASE_URL` → API base URL (default: `https://api.cal.com`)
+- `CAL_API_VERSION` → API version (default: `2024-01-01`)
+- `CAL_WEBHOOK_SECRET` → Webhook signature secret (optional)
+
+#### Programmatic Booking
+
+Create bookings from Whop purchases or other triggers:
+
+```typescript
+import { createBookingFromPurchase } from '@ajdigital/automation-hub';
+
+await createBookingFromPurchase({
+  eventTypeId: 123,
+  start: '2025-11-20T14:00:00Z',
+  end: '2025-11-20T15:00:00Z',
+  name: 'John Doe',
+  email: 'john@example.com',
+  timeZone: 'America/New_York',
+});
+```
+
+#### Frontend Usage
+
+In `audiojones.com` or portals, embed Cal.com booking links:
+
+```tsx
+// React/Next.js component
+<iframe
+  src={`https://cal.com/audiojones/${slug}`}
+  style={{ width: '100%', height: '700px', border: 0 }}
+  allow="camera; microphone; clipboard-read; clipboard-write"
+/>
+```
+
+Slugs come from `CAL_EVENT_TYPES` config (e.g., `"discovery-call-15"`, `"client-onboarding-audiojones"`).
+
+---
+
+## Worker & Integrations
+
+### Inbox Drivers
+
+The worker supports pluggable inbox adapters for event consumption:
+
+#### In-Memory Driver (Development)
+```powershell
+# Default for local testing
+npm run worker:run
+# or
+$env:INBOX_DRIVER="memory"; npm run worker:run
+```
+
+#### Firestore Driver (Production)
+```powershell
+# Production mode with Firestore collections
+$env:INBOX_DRIVER="firestore"
+$env:FIREBASE_PROJECT_ID="your-project-id"
+$env:FIREBASE_CLIENT_EMAIL="service-account@project.iam.gserviceaccount.com"
+$env:FIREBASE_PRIVATE_KEY="-----BEGIN PRIVATE KEY-----\n...\n-----END PRIVATE KEY-----\n"
+
+npm run worker:run
+```
+
+**Firestore Configuration**:
+- `portalEvents` collection → Events from client-facing portals
+- `adminEvents` collection → Internal admin operations
+- Each event document requires `status: 'pending'` to be processed
+- Worker marks events as `processed` or `failed` with timestamps
+
+**Environment Variables**:
+- `INBOX_DRIVER` → `"memory"` or `"firestore"` (default: `"memory"`)
+- `FIREBASE_PROJECT_ID` → Firebase project identifier
+- `FIREBASE_CLIENT_EMAIL` → Service account email
+- `FIREBASE_PRIVATE_KEY` → Service account private key (with newlines)
+
+### N8N Webhook Integration
+
+Optional helper for emitting events to n8n workflows:
+
+```typescript
+import { N8nEmitter } from '@ajdigital/automation-hub';
+
+const emitter = new N8nEmitter({
+  webhookUrl: 'https://n8n.example.com/webhook/abc123',
+  timeoutMs: 5000,
+});
+
+// Check if configured
+if (emitter.isEnabled) {
+  await emitter.emit(event);
+}
+
+// Batch emit
+await emitter.emitBatch([event1, event2, event3]);
+```
+
+**Environment Variables**:
+- `N8N_WEBHOOK_URL` → n8n webhook endpoint (optional)
+
+**Features**:
+- Graceful fallback when webhook URL not configured
+- Configurable timeout (default: 5s)
+- Best-effort delivery with error logging
+- Batch emit support
 
 ### Maintenance
 
